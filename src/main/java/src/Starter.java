@@ -35,7 +35,7 @@ public class Starter {
         //stworzenie obiektu klasy Meeting
         Meeting meeting = new Meeting();
         //wywyłanie metody z klasy Meeting, która przyjmuje jako argumenty obiektu calendar1, calendar2 oraz czas trwania psotkania, meetingDuration
-        System.out.println(meeting.letsmeet(calendar1,calendar2,"02:30"));
+        System.out.println(meeting.letsmeet(calendar1,calendar2,"00:30"));
 
     }
 }
