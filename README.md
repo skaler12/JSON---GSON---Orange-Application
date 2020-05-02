@@ -2,7 +2,7 @@
 ![logo-orange](https://user-images.githubusercontent.com/57706581/80892268-fe899a00-8cc8-11ea-914e-439286e07261.jpg)
 
 Zadanie rekrutacyjne na praktyki Let's Orange! Stanowisko #Java #Spring # Unit tests - Grzegorz Poznański 
-Link do opisu aplikacji na YouTube:
+Link do opisu aplikacji na YouTube: https://www.youtube.com/watch?v=qSVD-n7O91Y&feature=youtu.be
 
 
 #Założenia Aplikacji
