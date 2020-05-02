@@ -2,7 +2,9 @@ package src.entity;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.internal.bind.util.ISO8601Utils;
 
+import java.sql.SQLOutput;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,12 +33,23 @@ public class Meeting {
         this.plannedMeeting = plannedMeeting;
     }
 
-    //niech to będzie metoda pozwalająca na ustawienie meetengu
-    //Callendar 1 to klandarz 1 osoby,
-    //Callendar 2 to klandarz 2 osoby,
-    public String meeting(Meeting callendar1, Meeting callendar2,String meetingDuration) {
+    public String letsmeet(Meeting callendar1, Meeting callendar2,String meetingDuration) {
+
+
+        /**
+         *  Etap 1
+         *  Cel:Wyizolowanie wspólnej listy czasów pracy dla obu osób, czas w którym obie osoby pracują
+         *
+         * - Stworzenie listy czasów, wraz z listami pomocniczymi.
+         * - Dopasowanie trwania meetingu (meetingDuration) do pomocniczej zmiennej typu int duration.
+         * - Wyizolowanie listy czasów pracy dla obu osób typu String , List<String>WorkingHours
+         */
+
         int duration=0;
         String wynik ="Długość twojego spotkania wynosi: "+meetingDuration+"\n";
+
+        //zabezpieczenie metody na wypadek błędnygo podania argumentów funkcji letsmeet
+
         try {
             if (meetingDuration.equals("00:30")) {
                 duration = 1;
@@ -110,7 +123,81 @@ public class Meeting {
             if (meetingDuration.equals("12:00")) {
                 duration = 24;
             }
-            //stworze najpierw liste czasow co 30 minut
+            if (meetingDuration.equals("12:30")) {
+                duration = 25;
+            }
+            if (meetingDuration.equals("13:00")) {
+                duration = 26;
+            }
+            if (meetingDuration.equals("13:30")) {
+                duration = 27;
+            }
+            if (meetingDuration.equals("14:00")) {
+                duration = 28;
+            }
+            if (meetingDuration.equals("14:30")) {
+                duration = 29;
+            }
+            if (meetingDuration.equals("15:00")) {
+                duration = 30;
+            }
+            if (meetingDuration.equals("15:30")) {
+                duration = 31;
+            }
+            if (meetingDuration.equals("16:00")) {
+                duration = 32;
+            }
+            if (meetingDuration.equals("16:30")) {
+                duration = 33;
+            }
+            if (meetingDuration.equals("17:00")) {
+                duration = 34;
+            }
+            if (meetingDuration.equals("17:30")) {
+                duration = 35;
+            }
+            if (meetingDuration.equals("18:00")) {
+                duration = 36;
+            }
+            if (meetingDuration.equals("18:30")) {
+                duration = 37;
+            }
+            if (meetingDuration.equals("19:00")) {
+                duration = 38;
+            }
+            if (meetingDuration.equals("19:30")) {
+                duration = 39;
+            }
+            if (meetingDuration.equals("20:00")) {
+                duration = 40;
+            }
+            if (meetingDuration.equals("20:30")) {
+                duration = 41;
+            }
+            if (meetingDuration.equals("21:00")) {
+                duration = 42;
+            }
+            if (meetingDuration.equals("21:30")) {
+                duration = 43;
+            }
+            if (meetingDuration.equals("22:00")) {
+                duration = 44;
+            }
+            if (meetingDuration.equals("22:30")) {
+                duration = 45;
+            }
+            if (meetingDuration.equals("23:00")) {
+                duration = 46;
+            }
+            if (meetingDuration.equals("23:30")) {
+                duration = 47;
+            }
+            if (meetingDuration.equals("24:00")) {
+                duration = 48;
+            }
+
+            //stworzenie czasów w odstępach 30 minutowych
+
             String time0 = "00:00";
             String time1 = "00:30";
             String time2 = "01:00";
@@ -159,6 +246,8 @@ public class Meeting {
             String time45 = "22:30";
             String time46 = "23:00";
             String time47 = "23:30";
+
+            //Przypisanie wartości do listy czas.
 
             List<String> czas = new LinkedList<>();
             czas.add(time0);
@@ -210,9 +299,10 @@ public class Meeting {
             czas.add(time46);
             czas.add(time47);
 
+            //wyciągam do zmiennych godziny pracy dla 2 osób
             WorkingHours workingHours1 = callendar1.getWorkingHours();
             WorkingHours workingHours2 = callendar2.getWorkingHours();
-            //mam liste czasu calkowitego w ciagu doby
+            // lista czasu calkowitego w ciagu doby
             List<Integer> inEndWork = new LinkedList<>();
             Integer inWorkStartTime = 0;
             Integer inWorkEndTime = 0;
@@ -234,7 +324,7 @@ public class Meeting {
                 }
             }
 
-            //teraz sprawdzam jak powinny zapisac sie godziny pracy osob
+            //teraz sprawdzam jak powinny zapisac sie godziny pracy 2 osob
             List<Integer> HelpingIntList = new LinkedList<>();
             List<String> workingHours = new LinkedList<>();
             if (inWorkStartTime < inWorkEndTime) {
@@ -253,23 +343,28 @@ public class Meeting {
                     HelpingIntList.add(i);
                 }
             }
-            //moment wypisanie godzin w ktorych obydwie osoby pracuja
-            for (String Hours : workingHours) {
-                System.out.println(Hours);
-            }
-            ;
-            //KONIEC ETAPU 1 - MAM WYIZOLOWANE GODZINIY PRACY DLA OSÓB
 
-            //wystawienie 2 planow dla 2 osob
+            //KONIEC ETAPU 1
+//-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+            /**
+             * Etap 2
+             * Cel:Utworzenie listy wspólnych godzin wolnego czasu dla 2 osób. Lista ma zawierać daty, lecz bez godzin zakończeń spotkań
+             * Zakończenia spotkań nie są uwzględniane, gdyż może zacząć się wtedy kolejne spotkanie
+             * przykład: spotkanie od 15:00-16:30, wartość 16:30 nie powinna zostać zapisana w liście
+             * - Wyizolowanie 2 list ,po 1 dla każdej z osób w celu ustalenia ich czasów aktualnych spotkań
+             * - Wyizolowanie listy wolnych terminów spotkań freeTimeLastList
+             * - Utworzenie list pomocniczych zawierający numery indeksów listy w celu łatwiejszego wyświetlenia danych w kroku 3. - indexList
+             */
+            //wyniesienie godzin aktualnych spotkań dla 1 osoby do zmiennej typu PlannedMeeting
             List<PlannedMeeting> plannedMeeting1 = callendar1.getPlannedMeeting();
 
-            //najpierw musze wyizolowac punkty inta dla spotkan, dopiero potem moge porownywac je z lista dostepnych godzin
+            //najpierw wyizoluje punkty typu int dla spotkan
             List<Integer> IntegerMeeting1 = new LinkedList<>();
             for (int j = 0; j <= plannedMeeting1.size() - 1; j++) {
                 //tutaj iteruje po czasie pracy wspolnym dla obojga osob
                 for (int i = 0; i <= czas.size() - 1; i++) {
                     //tutaj warunek nie dodajacy mozliwych godzin spotkan jezeli sa one juz zajete w liscie aktualnych spotkan
-                    //warunek na continue
                     if (czas.get(i).equals(plannedMeeting1.get(j).getStart())) {
                         int k = i;
                         do {
@@ -280,21 +375,17 @@ public class Meeting {
                     }
                 }
             }
-            //tutaj mam juz zrobiona liste godzin spotkan ktore sa juz zajete dal 1 pracownika
-            for (int wypisz1 : IntegerMeeting1) {
-                System.out.println(wypisz1);
-            }
+            //tutaj mam juz zrobiona liste godzin spotkan ktore sa juz zajete dla 1 osoby
 
-            System.out.println();
-
-
+            //wyniesienie godzin aktualnych spotkań dla 1 osoby do zmiennej typu PlannedMeeting
             List<PlannedMeeting> plannedMeeting2 = callendar2.getPlannedMeeting();
+
+            //najpierw wyizoluje punkty typu int dla spotkan
             List<Integer> IntegerMeeting2 = new LinkedList<>();
             for (int j = 0; j <= plannedMeeting2.size() - 1; j++) {
                 //tutaj iteruje po czasie pracy wspolnym dla obojga osob
                 for (int i = 0; i <= czas.size() - 1; i++) {
                     //tutaj warunek nie dodajacy mozliwych godzin spotkan jezeli sa one juz zajete w liscie aktualnych spotkan
-                    //warunek na continue
                     if (czas.get(i).equals(plannedMeeting2.get(j).getStart())) {
                         int k = i;
                         do {
@@ -305,15 +396,14 @@ public class Meeting {
                     }
                 }
             }
-            //tutaj mam juz zrobiona liste godzin spotkan ktore sa juz zajete dal 1 pracownika
-            for (int wypisz2 : IntegerMeeting2) {
-                System.out.println(wypisz2);
-            }
+            //tutaj mam juz zrobiona liste godzin spotkan ktore sa juz zajete dla 2 osoby
+
             // w tym momencie mam stworzone w 2 etapie listy INT dla 2 pracownikow oddzielnie
             //listy zawieraja godziny w ktorych pracownicy maja juz spotkania
 
             //robimy listy w których pracownicy nie maja spotkan i pracuja w czasie wspolnym uwzgledniajac zachdzenie czasu
-            //ista nr 1
+
+            //Lista nr 1
             List<Integer> freeTime1 = new LinkedList<>();
             for (int i = 0; i <= HelpingIntList.size() - 2; i++) {
                 int k = 0;
@@ -328,12 +418,7 @@ public class Meeting {
                 }
                 freeTime1.add(HelpingIntList.get(i));
             }
-            System.out.println();
-            for (int freetime1 : freeTime1) {
-                System.out.println(freetime1);
-            }
 
-            System.out.println();
             //lista nr 2
             List<Integer> freeTime2 = new LinkedList<>();
             for (int i = 0; i <= HelpingIntList.size() - 2; i++) {
@@ -349,12 +434,9 @@ public class Meeting {
                 }
                 freeTime2.add(HelpingIntList.get(i));
             }
-            System.out.println();
-            for (int freetime2 : freeTime2) {
-                System.out.println(freetime2);
-            }
-            System.out.println();
+
             //mamy tutaj juz listy int z mozliwymi godzinami pracy ale bez godzin zakonczenia potencjalnego spotkania
+            //cel z etapu 2 zachowany
 
             //robimy wspolna liste wolnych czasow
             List<Integer> freeTimeLastList = new LinkedList<>();
@@ -365,122 +447,52 @@ public class Meeting {
                     }
                 }
             }
-            List<Integer>indexList = new LinkedList<>();
-            for(int i =0; i<=freeTimeLastList.size()-1;i++){
+            //utworzenie pomocniczej listy z Indeksami listy freeTimeLastList w celu łatwiejszego wypisania potencjalnych
+            //godzin spotkań w etapie 3
+            List<Integer> indexList = new LinkedList<>();
+            for (int i = 0; i <= freeTimeLastList.size() - 1; i++) {
                 indexList.add(i);
             }
-            for (int allfree : freeTimeLastList) {
-                System.out.println(allfree);
-            }
 
-            //mamy wspolna liste czasow ale bez czasow zakonczen spotkan ,jednak nie ma juz problemu godziny zakanczajacej
             //KONIEC ETAPU 2
 //--------------------------------------------------------------------------------------------------------------------------------------------------
-            //teraz etap 3, czyli odpowiednie wypisanie godzin spotkań  w zaleznosci od mmeting duration:
-            //przechodzi po wszystkich wynikach
-            wynik=wynik+"[";
-            for(int i = freeTimeLastList.size()-1; i >= 0; i--){
-                //tutaj po wszystki wynikach w 2 strone tylko bez koncow ,same poczatki chyba :/
-                    for(int j = 0; j<=freeTimeLastList.size()-1; j++){
-                        //sprawdza czy i-j jest na pewno oki równe podanemu odstepowi(duration)
-
-                        //teraz trzeba jeszcze sprawdzic czy pomiedzy nibi nie ma jakiegos spotkania
-                        if(((freeTimeLastList.get(i))+1) - (freeTimeLastList.get(j))==duration){
-
-                            if((duration>=2)&&(((freeTimeLastList.get(indexList.get(i))-(freeTimeLastList.get(indexList.get(j)))==(duration-1)))||(freeTimeLastList.get(indexList.get(i))-(freeTimeLastList.get(indexList.get(j)))==(duration)))){
-                                wynik = wynik + "["+(czas.get(freeTimeLastList.get(j)) + "," + czas.get(freeTimeLastList.get(i) + 1))+"]";
-                            }
-                            //tu sytuacja tylko dla 30 minut - 1 odstepu i jest juz git
-                            else{
-                                wynik=wynik+"["+(czas.get(freeTimeLastList.get(j)) + "," + czas.get(freeTimeLastList.get(i) + 1))+"]";
-                            }
+            /**
+             * Etap 3
+             * Cel: Wyświetlenie możliwych czasów pracy zależnych od zmiennej pomocniczej duration
+             * zgodnie z założeniem godziny wyświetlone w odpowinich przedziałach wynikających z
+             * meetingDuration, podanych funkcji letsmeet.
+             */
+            //stworznie zmiennej typu String zwracanej w funkcji o nazwie wynik
+            wynik = wynik + "[";
+            //iteracja po elementach listy pomocniczej zawierajacej wolne godziny dla 2 osob
+            for (int i = freeTimeLastList.size() - 1; i >= 0; i--) {
+                //iteraca tutaj po wszystki wynikach jednak od tyłu tak by nie ominąć żadnej kombinacji
+                for (int j = 0; j <= freeTimeLastList.size() - 1; j++) {
+                    //warunek sprawdzajacy dlugosc spotkania
+                    if (((freeTimeLastList.get(i)) + 1) - (freeTimeLastList.get(j)) == duration) {
+                        //dodatkowy warunek  uwzgledniajacy czy aby pomiedzy aktualnymi godzinami nie wystepuje juz jakies spotkanie
+                        if ((duration >= 2) && (((freeTimeLastList.get(indexList.get(i)) - (freeTimeLastList.get(indexList.get(j))) == (duration - 1))) || (freeTimeLastList.get(indexList.get(i)) - (freeTimeLastList.get(indexList.get(j))) == (duration)))) {
+                            wynik = wynik + "[" + (czas.get(freeTimeLastList.get(j)) + "," + czas.get(freeTimeLastList.get(i) + 1)) + "]";
+                        }
+                        //warunek dla szczególnego przypadku - spotkania 30 minutowego, czyli najkrótszego jakie możliwe do ustalenia w tej metodzie
+                        else {
+                            wynik = wynik + "[" + (czas.get(freeTimeLastList.get(j)) + "," + czas.get(freeTimeLastList.get(i) + 1)) + "]";
                         }
                     }
+                }
             }
             wynik=wynik+"]";
-            //twprze loste pomocnicza
-        /*List<Integer>pomocnicza = new LinkedList<>();
-        int p =0;
-        int x =0;
-        String wynik = "[";
-        //lece po liscie freetime od prze ostatniego wyrazu
-        for(int i =0; i<=freeTimeLastList.size()-2; i++ ){
-            //jezeli wyraz i jest rowny wyrazowi get(i+1)-1 to wchodze do if'a
+            //KONIEC ETAPU 3
+    //---------------------------------------------------------------------------------------------------------------------------------------------------
 
-            if((freeTimeLastList.get(i).equals((freeTimeLastList.get(i+1))-1))||(p>0)){
-                p++;
-                //jezeli i+1 jest rowne rozmiarowi listy - czyli ostatnia iteracja
-                if((i+1)==(freeTimeLastList.size()-1)){
-                    //to dodajemy 2 wyrazy ostatnie
-                    //dodajemy przeostatni wyraz
-                    pomocnicza.add(freeTimeLastList.get(i));
-                    //dodajemy ostatni wyraz
-                    pomocnicza.add(freeTimeLastList.get(i+1));
-                }
-                //w przeciwnym wypadku dodajemy tylko ten wyraz
-                else {
-                    pomocnicza.add(freeTimeLastList.get(i));
-                    x=freeTimeLastList.get(i+1);
 
-                }
-                    //jezeli rozmiar listy omocniczej >=2 to wchodze do if'a
-                    if ((pomocnicza.size()) >= 2) {
-                        //jezeli to juz jest rozne to wtedy
-
-                        if ((!pomocnicza.get(pomocnicza.size()-1).equals(x))||((i+1)==(freeTimeLastList.size()-1))) {
-                            //wypisuje ten nawias z pierwszym wyrazem i przedostatnim
-                            wynik = wynik + "[" + czas.get(pomocnicza.get(0)) + "," + czas.get((pomocnicza.get(pomocnicza.size()-2))+2) + "]";
-                            //na koniec resetuje liste pomocnicza
-                            for (int j = pomocnicza.size() - 1; j >= 0; j--) {
-                                pomocnicza.remove(j);
-                            }
-                            p=0;
-                        }
-                    }
-            }
-            else{
-                if(p==0) {
-                    wynik = wynik + "[" + czas.get((freeTimeLastList.get(i))) + "," + czas.get((freeTimeLastList.get(i)) + 1) + "]";
-                }
-                //tutaj jakas zmiana jeszcze
-                else if((p==0)&&(i==freeTimeLastList.size()-1)){
-                    wynik = wynik + "[" + czas.get((freeTimeLastList.get(i+1))) + "," + czas.get((freeTimeLastList.get(i)) + 2) + "]";
-                }
-            }
-        };
-        wynik = wynik + "]";
-        //KONIEC ETAPU 3
-
-       */
-
-       /* String wynik = "[";
-        for (int i =0; i<=freeTimeLastList.size()-1;i++){
-            wynik = wynik + "["+czas.get(freeTimeLastList.get(i))+","+czas.get((freeTimeLastList.get(i))+1)+"]";
-        }
-
-        */
         }
         catch (Exception e){
-            System.out.println("Nie odnaleziono mozliwych spotkań");
+            System.out.println("Ups... coś poszło nie tak, upewnij się że dane wejściowe są poprawne.");
         }
+        //wpisanie godzin potencjalnych spotkań
         return wynik;
     }
-
-
-      /*  List<Integer>user1freeHoursHelpingInt = new LinkedList<>();
-        //tutaj iteruje po kolejnych spotkaniach dla 1 osoby
-        for(int k=0;k<=plannedMeeting1.size()-1;k++){
-            //tutaj iteruje po czasie pracy wspolnym dla obojga osob
-            for(int i=HelpingIntList.get(0); i<=HelpingIntList.size()-1;i++){
-                //tutaj warunek nie dodajacy mozliwych godzin spotkan jezeli sa one juz zajete w liscie aktualnych spotkan
-                //warunek na continue
-                user1freeHoursHelpingInt.add(i);
-            }
-        }
-        plannedMeeting1.get(0).getStart();
-        plannedMeeting1.get(0).getEnd();
-
-*/
 }
 
 
