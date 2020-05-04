@@ -6,7 +6,7 @@ Link do opisu aplikacji na YouTube: https://www.youtube.com/watch?v=qSVD-n7O91Y&
 
 
 #Założenia Aplikacji
-Podstawowym założeniem aplikacji jest pobranie z plików JSON danych oraz parsowanie ich na obiektu w celu odnalezienia odpowiednich godzin spotkań dla każdej z osób.
+Podstawowym założeniem aplikacji jest pobranie z plików JSON danych oraz parsowanie ich na obiekty celem odnalezienia odpowiednich godzin spotkań dla każdej z osób.
 Potencjalne spotkania uzależnione są od takich czynników jak:
 - Czas trwania spotkania
 - Godziny pracy każdej z osób 
