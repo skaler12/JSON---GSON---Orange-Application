@@ -35,6 +35,12 @@ public class Starter {
         //stworzenie obiektu klasy Meeting
         Meeting meeting = new Meeting();
         //wywyłanie metody z klasy Meeting, która przyjmuje jako argumenty obiektu calendar1, calendar2 oraz czas trwania psotkania, meetingDuration
+        /**
+         * Oczekiwany typ-zapis zmiennej meeting Duration !
+         * HH:mm
+         * np. 00:30
+         * np. 01:00
+         */
         System.out.println(meeting.letsmeet(calendar1,calendar2,"00:30"));
 
     }
